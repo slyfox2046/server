@@ -153,3 +153,31 @@ const server = app.listen(8000,"localhost",()=>{
 
 ```
 
+
+
+***
+
+## 8-3 http通讯
+
+### 1. 手工subscribe 订阅流 
+
+在客户端中 引入 import ’rxjs/Rx‘  ：
+
+![get请求](pics/getreq.jpg)
+
+客户端侧配置代理文件 proxy.conf.json ![](pics/proxyconf.jpg)
+
+server文件中，修改请求路径，“/api/xxxxx”
+
+
+
+### 2. 异步管道方式
+
+客户端模板文件
+
+![](pics/async.jpg)
+
+客户端ts文件：
+
+![](pics/async2.jpg)
+

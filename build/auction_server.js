@@ -26,11 +26,11 @@ var app = express();
 app.get('/', function (req, res) {
     res.send("Hello Express!!!");
 });
-app.get('/products', function (req, res) {
+app.get('/api/products', function (req, res) {
     // res.send("接收到商品查询请求！");
     res.json(products);
 });
-app.get('/products/:id', function (req, res) {
+app.get('/api/products/:id', function (req, res) {
     res.json(products.find(function (product) { return product.id == req.params.id; }));
 });
 var server = app.listen(8000, "localhost", function () {
