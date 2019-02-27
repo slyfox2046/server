@@ -161,7 +161,7 @@ const server = app.listen(8000,"localhost",()=>{
 
 ### 1. 手工subscribe 订阅流 
 
-在客户端中 引入 import ’rxjs/Rx‘  ：
+在客户端中 引入 **import ’rxjs/Rx‘**  ：
 
 ![get请求](pics/getreq.jpg)
 
