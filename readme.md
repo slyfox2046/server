@@ -181,3 +181,10 @@ server文件中，修改请求路径，“/api/xxxxx”
 
 ![](pics/async2.jpg)
 
+***
+
+请求头的使用：
+
+在上面文件中添加：
+
+![](pics/headers.jpg)
