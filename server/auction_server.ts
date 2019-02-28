@@ -53,6 +53,7 @@ app.get('/api/products',(req,res)=>{
     // res.send("接收到商品查询请求！");
     let result = products;
     let params = req.query;
+    console.log(params);
 
     if(JSON.stringify(params) =='{}'){
         result = products;
@@ -63,7 +64,7 @@ app.get('/api/products',(req,res)=>{
             result = result.filter((p)=>p.title.indexOf(params.title)!==-1);
         }
 
-        if(params.price!="null" && result.length>0){
+        if(params.price && params.price!="null" && result.length>0){
             result = result.filter((p)=>p.price <= parseInt(params.price));
         }
 
