@@ -58,18 +58,23 @@ app.get('/api/products',(req,res)=>{
         result = products;
 
     }else {
+
         if(params.title){
             result = result.filter((p)=>p.title.indexOf(params.title)!==-1);
         }
-        if(params.price && result.length>0){
+
+        if(params.price!="null" && result.length>0){
             result = result.filter((p)=>p.price <= parseInt(params.price));
         }
-        if(params.category && result.length>0){
+
+        if(params.category!="-1" && result.length>0){
             result = result.filter((p)=>p.categories.indexOf(params.category)!==-1);
         }
+        console.log(result);
 
     }
-
+    console.log("111111");
+    console.log(result);
     res.json(result);
 });
 app.get('/api/product/:id',(req,res)=>{
