@@ -1,5 +1,7 @@
 import * as express from 'express'
 import {Server} from 'ws'
+import * as path from "path";
+
 export class Product {
     constructor(
         public  id:number,
@@ -12,6 +14,18 @@ export class Product {
     ){
     }
 }
+export class Comment {
+    constructor(public id :number,
+                public productId:number,
+                public timestamp:string,
+                public user:string,
+                public rating:number,
+                public content:string){
+
+    }
+
+}
+
 const products :Product[] = [
     new Product(1,"第一个商品",1.99,3.5,"这是第1个商品，是我在学习慕课网Angular入门实战时创建的",["电子产品","硬件设备"]),
     new Product(2,"第二个商品",2.99,2.5,"这是第2个商品，是我在学习慕课网Angular入门实战时创建的",["图书"]),
@@ -22,17 +36,32 @@ const products :Product[] = [
     new Product(7,"第七个商品",4.99,3.5,"这是第7个商品，是我在学习慕课网Angular入门实战时创建的",["图书"])
 ];
 
+const  comments :Comment[] =[
+    new Comment(1,1,"2018-07-1 22:22:23" ,"张三",3,"东西不错"),
+    new Comment(2,1,"2018-08-1 22:22:23" ,"李四",4,"东西很不错"),
+    new Comment(3,1,"2018-09-1 22:22:23" ,"王五",2,"东西确实不错"),
+    new Comment(4,2,"2018-10-1 22:22:23" ,"赵六",4,"东西的确不错"),
+];
+
+
 const app = express();
-app.get('/',(req,res)=>{
-    res.send("Hello Express!!!");
-});
+// app.get('/',(req,res)=>{
+//     res.send("Hello Express!!!");
+// });
+app.use('/', express.static(path.join(__dirname, '..', 'client')))
 app.get('/api/products',(req,res)=>{
     // res.send("接收到商品查询请求！");
     res.json(products);
 });
-app.get('/api/products/:id',(req,res)=>{
+app.get('/api/product/:id',(req,res)=>{
     res.json(products.find((product)=>product.id ==req.params.id ));
 });
+app.get('/api/product/:id/comments',(req,res)=>{
+    res.json(comments.filter((comment:Comment)=>comment.productId ==req.params.id ));
+});
+
+
+
 const server = app.listen(8000,"localhost",()=>{
     console.log("服务器已启动，地址是：http://localhost:8000");
 })
