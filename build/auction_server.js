@@ -49,7 +49,27 @@ var app = express();
 app.use('/', express.static(path.join(__dirname, '..', 'client')));
 app.get('/api/products', function (req, res) {
     // res.send("接收到商品查询请求！");
-    res.json(products);
+    // console.log(req.query);
+
+    let result = products;
+    let params = req.query;
+
+    if (JSON.stringify(params) === '{}'){
+        result = products;
+    }else{
+        if (params.title){
+            result = result.filter((p)=>p.title.indexOf(params.title) !==-1);
+        }
+        if (params.price !=="null" && result.length>0){
+            result = result.filter((p)=>p.price<=parseInt(params.price));
+        }
+        if (params.category !=="-1" && result.length>0){
+            result = result.filter((p)=>p.categories.indexOf(params.category) !==-1);
+        }
+
+    }
+
+    res.json(result);
 });
 app.get('/api/product/:id', function (req, res) {
     res.json(products.find(function (product) { return product.id == req.params.id; }));
