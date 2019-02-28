@@ -188,3 +188,68 @@ server文件中，修改请求路径，“/api/xxxxx”
 在上面文件中添加：
 
 ![](pics/headers.jpg)
+
+
+
+
+
+## 8-4 web socket 通讯
+
+**server端**
+
+npm install ws --save
+
+npm install @types/ws --save-dev
+
+---
+
+```js
+import {Server} from 'ws'
+//...
+//...
+const wsServer = new Server({port:8085});
+wsServer.on("connection",websocket =>{
+    websocket.send("这个消息是服务器主动推送的");
+    websocket.on("message",message=>{
+        console.log("接收到的消息："+message);
+    })
+})
+
+setInterval(()=>{
+    if(wsServer.clients){
+        wsServer.clients.forEach(client =>{
+            client.send("这是定时推送");
+        })
+    }
+},2000);
+```
+
+
+
+**client端**
+
+ng g service stared/webSocket
+
+web-socket.service.ts中
+
+![](pics/wss.jpg)
+
+![](pics/wssend.jpg)
+
+app.module.ts 中注入WebSocketService
+
+```js
+providers:[WebSocketService],
+```
+
+
+
+web-socket.component.ts中：
+
+![](pics/wscomponent.jpg)
+
+![1551320035637](pics/wscomponent_send.jpg)
+
+web-socket.component.html中：
+
+![1551320106679](pics/wscomponent_html.jpg)
