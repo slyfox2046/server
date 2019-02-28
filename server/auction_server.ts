@@ -51,7 +51,26 @@ const app = express();
 app.use('/', express.static(path.join(__dirname, '..', 'client')))
 app.get('/api/products',(req,res)=>{
     // res.send("接收到商品查询请求！");
-    res.json(products);
+    let result = products;
+    let params = req.query;
+
+    if(JSON.stringify(params) =='{}'){
+        result = products;
+
+    }else {
+        if(params.title){
+            result = result.filter((p)=>p.title.indexOf(params.title)!==-1);
+        }
+        if(params.price && result.length>0){
+            result = result.filter((p)=>p.price <= parseInt(params.price));
+        }
+        if(params.category && result.length>0){
+            result = result.filter((p)=>p.categories.indexOf(params.category)!==-1);
+        }
+
+    }
+
+    res.json(result);
 });
 app.get('/api/product/:id',(req,res)=>{
     res.json(products.find((product)=>product.id ==req.params.id ));
