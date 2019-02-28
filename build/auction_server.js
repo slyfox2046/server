@@ -49,7 +49,23 @@ var app = express();
 app.use('/', express.static(path.join(__dirname, '..', 'client')));
 app.get('/api/products', function (req, res) {
     // res.send("接收到商品查询请求！");
-    res.json(products);
+    var result = products;
+    var params = req.query;
+    if (JSON.stringify(params) == '{}') {
+        result = products;
+    }
+    else {
+        if (params.title) {
+            result = result.filter(function (p) { return p.title.indexOf(params.title) !== -1; });
+        }
+        if (params.price && result.length > 0) {
+            result = result.filter(function (p) { return p.price <= parseInt(params.price); });
+        }
+        if (params.category && result.length > 0) {
+            result = result.filter(function (p) { return p.categories.indexOf(params.category) !== -1; });
+        }
+    }
+    res.json(result);
 });
 app.get('/api/product/:id', function (req, res) {
     res.json(products.find(function (product) { return product.id == req.params.id; }));
