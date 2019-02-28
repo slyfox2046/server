@@ -1,6 +1,7 @@
 # 14-Angular 4.0从入门到实战 打造股票管理网站  全
 
 # 第八章（web服务器auction配套server）
+项目启动：nodemon build/auction_server.js
 
 ## 8-2 web服务器
 
