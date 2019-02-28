@@ -51,6 +51,7 @@ app.get('/api/products', function (req, res) {
     // res.send("接收到商品查询请求！");
     var result = products;
     var params = req.query;
+    console.log(params);
     if (JSON.stringify(params) == '{}') {
         result = products;
     }
@@ -58,7 +59,7 @@ app.get('/api/products', function (req, res) {
         if (params.title) {
             result = result.filter(function (p) { return p.title.indexOf(params.title) !== -1; });
         }
-        if (params.price != "null" && result.length > 0) {
+        if (params.price && params.price != "null" && result.length > 0) {
             result = result.filter(function (p) { return p.price <= parseInt(params.price); });
         }
         if (params.category != "-1" && result.length > 0) {
@@ -79,7 +80,7 @@ var server = app.listen(8000, "localhost", function () {
 var subscription = new Map();
 var wsServer = new ws_1.Server({ port: 8085 });
 wsServer.on("connection", function (websocket) {
-    websocket.send("这个消息是服务器主动推送的");
+    // websocket.send("这个消息是服务器主动推送的");
     websocket.on('message', function (message) {
         // console.log("接收到的消息："+message);
         var messageObj = JSON.parse(message);
@@ -95,11 +96,17 @@ setInterval(function () {
         currentBids.set(p.id, newBid);
     });
     subscription.forEach(function (productIds, ws) {
-        var newBids = productIds.map(function (pid) { return ({
-            productId: pid,
-            bid: currentBids.get(pid)
-        }); });
-        ws.send(JSON.stringify(newBids));
+        //readState 防止页面刷新出错
+        if (ws.readyState === 1) {
+            var newBids = productIds.map(function (pid) { return ({
+                productId: pid,
+                bid: currentBids.get(pid)
+            }); });
+            ws.send(JSON.stringify(newBids));
+        }
+        else {
+            subscription.delete(ws);
+        }
     });
 }, 2000);
 // setInterval(()=>{

@@ -90,7 +90,7 @@ const server = app.listen(8000,"localhost",()=>{
 const subscription = new Map<any ,number[]>();
 const wsServer = new Server({port:8085});
 wsServer.on("connection",websocket =>{
-    websocket.send("这个消息是服务器主动推送的");
+    // websocket.send("这个消息是服务器主动推送的");
     websocket.on('message',(message:string)=>{
         // console.log("接收到的消息："+message);
         let messageObj = JSON.parse(message);
@@ -109,12 +109,17 @@ setInterval(()=>{
        currentBids.set(p.id,newBid);
     });
     subscription.forEach((productIds:number[],ws)=>{
-        let newBids = productIds.map( pid=>({
+        //readState 防止页面刷新出错
+        if(ws.readyState === 1){
+            let newBids = productIds.map( pid=>({
                 productId:pid,
                 bid:currentBids.get(pid)
-        }));
+            }));
+            ws.send(JSON.stringify(newBids));
+        }else{
+            subscription.delete(ws);
+        }
 
-        ws.send(JSON.stringify(newBids));
     })
     },2000);
 
