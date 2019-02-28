@@ -66,18 +66,41 @@ const server = app.listen(8000,"localhost",()=>{
     console.log("服务器已启动，地址是：http://localhost:8000");
 })
 
+const subscription = new Map<any ,number[]>();
 const wsServer = new Server({port:8085});
 wsServer.on("connection",websocket =>{
     websocket.send("这个消息是服务器主动推送的");
-    websocket.on("message",message=>{
-        console.log("接收到的消息："+message);
+    websocket.on('message',(message:string)=>{
+        // console.log("接收到的消息："+message);
+        let messageObj = JSON.parse(message);
+        let productIds = subscription.get(websocket) || [];
+        subscription.set(websocket,[...productIds,messageObj.productId]);
+
     })
-})
+});
+
+const currentBids = new Map<number,number>();
 
 setInterval(()=>{
-    if(wsServer.clients){
-        wsServer.clients.forEach(client =>{
-            client.send("这是定时推送");
-        })
-    }
-},2000);
+    products.forEach(p=>{
+       let currentBid = currentBids.get(p.id) ||p.price;
+       let newBid = currentBid+Math.random() * 5 ;
+       currentBids.set(p.id,newBid);
+    });
+    subscription.forEach((productIds:number[],ws)=>{
+        let newBids = productIds.map( pid=>({
+                productId:pid,
+                bid:currentBids.get(pid)
+        }));
+
+        ws.send(JSON.stringify(newBids));
+    })
+    },2000);
+
+// setInterval(()=>{
+//     if(wsServer.clients){
+//         wsServer.clients.forEach(client =>{
+//             client.send("这是定时推送");
+//         })
+//     }
+// },2000);

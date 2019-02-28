@@ -49,27 +49,7 @@ var app = express();
 app.use('/', express.static(path.join(__dirname, '..', 'client')));
 app.get('/api/products', function (req, res) {
     // res.send("接收到商品查询请求！");
-    // console.log(req.query);
-
-    let result = products;
-    let params = req.query;
-
-    if (JSON.stringify(params) === '{}'){
-        result = products;
-    }else{
-        if (params.title){
-            result = result.filter((p)=>p.title.indexOf(params.title) !==-1);
-        }
-        if (params.price !=="null" && result.length>0){
-            result = result.filter((p)=>p.price<=parseInt(params.price));
-        }
-        if (params.category !=="-1" && result.length>0){
-            result = result.filter((p)=>p.categories.indexOf(params.category) !==-1);
-        }
-
-    }
-
-    res.json(result);
+    res.json(products);
 });
 app.get('/api/product/:id', function (req, res) {
     res.json(products.find(function (product) { return product.id == req.params.id; }));
@@ -80,18 +60,37 @@ app.get('/api/product/:id/comments', function (req, res) {
 var server = app.listen(8000, "localhost", function () {
     console.log("服务器已启动，地址是：http://localhost:8000");
 });
+var subscription = new Map();
 var wsServer = new ws_1.Server({ port: 8085 });
 wsServer.on("connection", function (websocket) {
     websocket.send("这个消息是服务器主动推送的");
-    websocket.on("message", function (message) {
-        console.log("接收到的消息：" + message);
+    websocket.on('message', function (message) {
+        // console.log("接收到的消息："+message);
+        var messageObj = JSON.parse(message);
+        var productIds = subscription.get(websocket) || [];
+        subscription.set(websocket, productIds.concat([messageObj.productId]));
     });
 });
+var currentBids = new Map();
 setInterval(function () {
-    if (wsServer.clients) {
-        wsServer.clients.forEach(function (client) {
-            client.send("这是定时推送");
-        });
-    }
+    products.forEach(function (p) {
+        var currentBid = currentBids.get(p.id) || p.price;
+        var newBid = currentBid + Math.random() * 5;
+        currentBids.set(p.id, newBid);
+    });
+    subscription.forEach(function (productIds, ws) {
+        var newBids = productIds.map(function (pid) { return ({
+            productId: pid,
+            bid: currentBids.get(pid)
+        }); });
+        ws.send(JSON.stringify(newBids));
+    });
 }, 2000);
+// setInterval(()=>{
+//     if(wsServer.clients){
+//         wsServer.clients.forEach(client =>{
+//             client.send("这是定时推送");
+//         })
+//     }
+// },2000);
 //# sourceMappingURL=auction_server.js.map
