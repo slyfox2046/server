@@ -70,11 +70,7 @@ app.get('/api/products',(req,res)=>{
         if(params.category!="-1" && result.length>0){
             result = result.filter((p)=>p.categories.indexOf(params.category)!==-1);
         }
-        console.log(result);
-
     }
-    console.log("111111");
-    console.log(result);
     res.json(result);
 });
 app.get('/api/product/:id',(req,res)=>{
